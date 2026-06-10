@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Card Quest — Collect. Battle. Ascend.</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-alt: #f5f5f7;
+        --ink: #1d1d1f;
+        --ink-soft: #6e6e73;
+        --accent: #6e3bd1;
+        --accent-2: #2997ff;
+        --radius: 28px;
+        --maxw: 1120px;
+        --shot-scale: 0.8; /* media size within its column: 0.8 = 20% smaller */
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+          Roboto, Helvetica, Arial, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.45;
+      }
+
+      /* ---------- Nav ---------- */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        background: rgba(255, 255, 255, 0.72);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      }
+      nav .nav-inner {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 22px;
+      }
+      nav .brand {
+        font-weight: 600;
+        font-size: 19px;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      nav .brand .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      }
+      nav .links {
+        display: flex;
+        gap: 26px;
+      }
+      nav .links a {
+        color: var(--ink-soft);
+        text-decoration: none;
+        font-size: 13px;
+        transition: color 0.2s ease;
+      }
+      nav .links a:hover {
+        color: var(--ink);
+      }
+      @media (max-width: 720px) {
+        nav .links {
+          display: none;
+        }
+      }
+
+      /* ---------- Hero ---------- */
+      header.hero {
+        text-align: center;
+        padding: 120px 22px 100px;
+        background: radial-gradient(
+          120% 90% at 50% 0%,
+          #efe7ff 0%,
+          #ffffff 55%
+        );
+      }
+      header.hero .eyebrow {
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 19px;
+        letter-spacing: 0.01em;
+        margin-bottom: 10px;
+      }
+      header.hero h1 {
+        font-size: clamp(40px, 8vw, 80px);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        background: linear-gradient(
+          120deg,
+          #1d1d1f 30%,
+          var(--accent) 75%,
+          var(--accent-2)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      header.hero p.sub {
+        max-width: 640px;
+        margin: 22px auto 0;
+        font-size: clamp(19px, 2.6vw, 26px);
+        color: var(--ink-soft);
+        font-weight: 400;
+        letter-spacing: -0.01em;
+      }
+      header.hero .cta {
+        margin-top: 38px;
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-block;
+        padding: 13px 26px;
+        border-radius: 980px;
+        font-size: 16px;
+        font-weight: 500;
+        text-decoration: none;
+        transition:
+          transform 0.15s ease,
+          opacity 0.2s ease;
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        opacity: 0.9;
+      }
+      .btn-ghost {
+        color: var(--accent-2);
+      }
+      .btn-ghost:hover {
+        text-decoration: underline;
+      }
+
+      /* ---------- Section headers ---------- */
+      .features {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 20px 22px;
+      }
+
+      .section-head {
+        text-align: center;
+        padding: 80px 0 10px;
+      }
+      .section-head .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 7px 15px;
+        border-radius: 980px;
+        margin-bottom: 16px;
+      }
+      .section-head .kicker .led {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      /* status palettes */
+      .k-now {
+        background: #e7f6ec;
+        color: #1a7f43;
+      }
+      .k-now .led {
+        background: #1fb45a;
+        box-shadow: 0 0 0 3px rgba(31, 180, 90, 0.18);
+      }
+      .k-dev {
+        background: #fff2e0;
+        color: #a85e10;
+      }
+      .k-dev .led {
+        background: #f59f2b;
+        box-shadow: 0 0 0 3px rgba(245, 159, 43, 0.18);
+      }
+      .k-future {
+        background: #ecebff;
+        color: #4b3bc4;
+      }
+      .k-future .led {
+        background: #6e3bd1;
+        box-shadow: 0 0 0 3px rgba(110, 59, 209, 0.18);
+      }
+
+      .section-head h2 {
+        font-size: clamp(30px, 5vw, 52px);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.05;
+      }
+      .section-head p {
+        max-width: 560px;
+        margin: 14px auto 0;
+        font-size: clamp(16px, 2vw, 20px);
+        color: var(--ink-soft);
+      }
+
+      /* ---------- Feature rows ---------- */
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 56px;
+        align-items: center;
+        padding: 64px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      }
+      .section:last-of-type .row:last-child {
+        border-bottom: none;
+      }
+
+      /* even rows -> description first, image second */
+      .row.reverse .media {
+        order: 2;
+      }
+      .row.reverse .copy {
+        order: 1;
+      }
+
+      .copy .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 14px;
+      }
+      .copy .tag .pill {
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        padding: 3px 9px;
+        border-radius: 980px;
+        text-transform: uppercase;
+      }
+      .pill.p-dev {
+        background: #fff2e0;
+        color: #a85e10;
+      }
+      .pill.p-future {
+        background: #ecebff;
+        color: #4b3bc4;
+      }
+
+      .copy h2 {
+        font-size: clamp(28px, 4vw, 44px);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.08;
+        margin-bottom: 16px;
+      }
+      .copy p {
+        font-size: clamp(16px, 2vw, 19px);
+        color: var(--ink-soft);
+        max-width: 30em;
+      }
+
+      /* screenshot placeholder */
+      .media .shot {
+        position: relative;
+        width: calc(100% * var(--shot-scale)); /* 20% smaller, centered below */
+        margin: 0 auto;
+        aspect-ratio: 4 / 3;
+        border-radius: var(--radius);
+        background: linear-gradient(145deg, #f0ecfb, #e7f1ff);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        box-shadow: 0 30px 60px -25px rgba(60, 40, 120, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition:
+          transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
+          box-shadow 0.4s ease;
+      }
+      .media .shot:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 40px 80px -30px rgba(60, 40, 120, 0.45);
+      }
+      .media .shot::after {
+        content: "";
+        position: absolute;
+        bottom: 16px;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(60, 40, 120, 0.45);
+      }
+      .media .shot .glyph {
+        font-size: 128px;
+        opacity: 0.85;
+        filter: drop-shadow(0 6px 18px rgba(60, 40, 120, 0.25));
+      }
+      /* real screenshot pulled by relative path — fades in over the placeholder.
+     object-fit: contain preserves the image's aspect ratio (never crops or
+     stretches). Once an image loads, JS sets the .shot's aspect-ratio to the
+     image's real shape so there are no empty bars around it. */
+      .media .shot img.ss {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        opacity: 0;
+        transition: opacity 0.45s ease;
+      }
+      .media .shot img.ss.loaded {
+        opacity: 1;
+      }
+      /* once a real image loads, hide the emoji + "placeholder" label */
+      .media .shot.has-img .glyph {
+        display: none;
+      }
+      .media .shot.has-img::after {
+        display: none;
+      }
+
+      /* reveal on scroll */
+      .reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      @media (max-width: 820px) {
+        .row,
+        .row.reverse {
+          grid-template-columns: 1fr;
+          gap: 28px;
+          padding: 44px 0;
+        }
+        .row.reverse .media,
+        .row.reverse .copy {
+          order: initial;
+        }
+      }
+
+      /* ---------- Footer ---------- */
+      footer {
+        background: var(--bg-alt);
+        text-align: center;
+        padding: 70px 22px 50px;
+        margin-top: 30px;
+      }
+      footer h3 {
+        font-size: clamp(26px, 4vw, 40px);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      footer p {
+        color: var(--ink-soft);
+        margin-top: 12px;
+        font-size: 17px;
+      }
+      footer .cta {
+        margin-top: 28px;
+      }
+      footer .fine {
+        margin-top: 44px;
+        font-size: 12px;
+        color: var(--ink-soft);
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-inner">
+        <div class="brand"><span class="dot"></span> Card Quest</div>
+        <div class="links">
+          <a href="#available">Available</a>
+          <a href="#development">In Development</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#play">Play</a>
+          <a href="privacy-policy.html" style="font-weight: 700; color: var(--accent)">Privacy Policy</a>
+          <a href="terms-of-service.html" style="font-weight: 700; color: var(--accent)">Terms of Service</a>
+          <a href="data-deletion.html" style="font-weight: 700; color: var(--accent)">Data Deletion</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="eyebrow">Card Quest</div>
+      <h1>Collect.&nbsp;Battle.&nbsp;Ascend.</h1>
+      <p class="sub">
+        A living trading-card universe of strategic duels, glittering packs, and
+        a player-run economy — all in your browser.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#play">Play Now</a>
+        <a class="btn btn-ghost" href="#available">Explore features ›</a>
+      </div>
+    </header>
+
+    <main class="features">
+      <!-- ===================== CURRENTLY AVAILABLE ===================== -->
+      <div class="section" id="available">
+        <div class="section-head reveal">
+          <span class="kicker k-now"
+            ><span class="led"></span> Currently Available</span
+          >
+          <h2>Playable today.</h2>
+          <p>
+            The core of Card Quest is live and ready — collect, progress, build,
+            and battle.
+          </p>
+        </div>
+
+        <!-- 0 (even) description first -->
+        <section class="row reverse reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="questpacks"
+                alt="Open quest packs screenshot"
+              /><span class="glyph">🎁</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Quest Packs</span>
+            <h2>Open quest packs.</h2>
+            <p>
+              Complete daily and quest objectives to earn packs, then tear them
+              open in a cinematic reveal. Every pull adds new cards to your
+              collection and pushes your decks a little further.
+            </p>
+          </div>
+        </section>
+
+        <!-- 1 (odd) image first -->
+        <section class="row reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="collection"
+                alt="Card collection screenshot"
+              /><span class="glyph">🃏</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Card Collection</span>
+            <h2>Your bag, your book, your masterpiece.</h2>
+            <p>
+              Open animated packs and gather hundreds of cards across heroes and
+              rarities. Browse everything in a fluid grid, track set completion
+              in the Book, and chase the elusive Radiant variant — a roughly 2%
+              shimmer that turns any card into a centerpiece.
+            </p>
+          </div>
+        </section>
+
+        <!-- 2 (even) description first -->
+        <section class="row reverse reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="progression"
+                alt="Progression screenshot"
+              /><span class="glyph">✨</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Progression System</span>
+            <h2>Grow stronger with every match.</h2>
+            <p>
+              Level up as you play and ascend your favorite cards to climb their
+              power curve, unlock new abilities, and celebrate every upgrade
+              with a dedicated animation. Turn a common pull into a champion
+              worth building around.
+            </p>
+          </div>
+        </section>
+
+        <!-- 3 (odd) image first -->
+        <section class="row reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="deck"
+                alt="Deck builder screenshot"
+              /><span class="glyph">🧩</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Deck Building</span>
+            <h2>Craft a deck that fights the way you do.</h2>
+            <p>
+              Drag, drop, and validate your lineup in real time. Build around
+              quickstrike tempo, raw power leads, or balanced control — the
+              builder enforces the rules so you can focus on the strategy.
+            </p>
+          </div>
+        </section>
+
+        <!-- 4 (even) description first -->
+        <section class="row reverse reveal">
+          <div class="media">
+            <div class="shot" style="--shot-scale: 1.2">
+              <img
+                class="ss"
+                data-key="gameplay"
+                alt="Core gameplay screenshot"
+              /><span class="glyph">⚔️</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Core Gameplay Loop</span>
+            <h2>Battle, earn, open, repeat.</h2>
+            <p>
+              Duel in fast, strategic battles, complete fresh daily quests, and
+              turn your rewards into new packs and stronger cards. It's the
+              satisfying loop that keeps every session moving forward.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===================== IN DEVELOPMENT ===================== -->
+      <div class="section" id="development">
+        <div class="section-head reveal">
+          <span class="kicker k-dev"
+            ><span class="led"></span> In Development</span
+          >
+          <h2>Coming soon.</h2>
+          <p>
+            Features in active development — taking Card Quest from a game into
+            a social economy.
+          </p>
+        </div>
+
+        <!-- 5 (odd) image first -->
+        <section class="row reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="trading"
+                alt="Trading screenshot"
+              /><span class="glyph">🤝</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >Player-to-Player Trading
+              <span class="pill p-dev">In dev</span></span
+            >
+            <h2>Trade directly with other players.</h2>
+            <p>
+              Swap cards face-to-face in secure, peer-to-peer trades. Complete a
+              collection, hand a friend the card they've been hunting, and make
+              every duplicate count.
+            </p>
+          </div>
+        </section>
+
+        <!-- 6 (even) description first -->
+        <section class="row reverse reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="marketplace"
+                alt="Marketplace screenshot"
+              /><span class="glyph">💱</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >Live Marketplace <span class="pill p-dev">In dev</span></span
+            >
+            <h2>A player-run economy that breathes.</h2>
+            <p>
+              List cards for sale, browse a constantly refreshing marketplace,
+              and let supply and demand find their own price. Find a bargain or
+              set the market — the economy is yours to shape.
+            </p>
+          </div>
+        </section>
+
+        <!-- 7 (odd) image first -->
+        <section class="row reveal">
+          <div class="media">
+            <div class="shot">
+              <img class="ss" data-key="raids" alt="Raids screenshot" /><span
+                class="glyph"
+                >🐉</span
+              >
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >Cooperative Raid Events
+              <span class="pill p-dev">In dev</span></span
+            >
+            <h2>Team up against raid bosses.</h2>
+            <p>
+              Take on towering co-op encounters and earn exclusive Raid packs
+              with guaranteed high-power cards. Raid loot lands straight in your
+              mailbox, ready to open whenever you want to celebrate the win.
+            </p>
+          </div>
+        </section>
+
+        <!-- 8 (even) description first -->
+        <section class="row reverse reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="leaderboards"
+                alt="Leaderboards screenshot"
+              /><span class="glyph">🏆</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >Competitive Leaderboards
+              <span class="pill p-dev">In dev</span></span
+            >
+            <h2>Climb the ranks, prove your deck.</h2>
+            <p>
+              Ranked PvP with skill-based matchmaking and a global leaderboard.
+              Every win pushes your rating higher — every loss is clamped to
+              your earned tier floor, so the climb always feels fair.
+            </p>
+          </div>
+        </section>
+
+        <!-- 9 (odd) image first -->
+        <section class="row reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="seasonal"
+                alt="Seasonal content screenshot"
+              /><span class="glyph">🗓️</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >Seasonal Content Updates
+              <span class="pill p-dev">In dev</span></span
+            >
+            <h2>The world keeps evolving.</h2>
+            <p>
+              Recurring seasons bring rotating challenges, themed rewards, and
+              fresh goals to chase. There's always a new reason to come back and
+              a new peak to reach.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===================== FUTURE ROADMAP ===================== -->
+      <div class="section" id="roadmap">
+        <div class="section-head reveal">
+          <span class="kicker k-future"
+            ><span class="led"></span> Future Roadmap</span
+          >
+          <h2>On the horizon.</h2>
+          <p>
+            Where Card Quest is headed next — bigger reach, bigger events,
+            bigger collections.
+          </p>
+        </div>
+
+        <!-- 10 (even) description first -->
+        <section class="row reverse reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="telegram"
+                alt="Telegram release screenshot"
+              /><span class="glyph">📲</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >Future Plarform Release
+              <span class="pill p-future">Planned</span></span
+            >
+            <h2>Play right inside Telegram and TikTok Mini games.</h2>
+            <p>
+              A native app experience that brings Card Quest to where your
+              friends already are — instant matches, shared invites, and zero
+              installs.
+            </p>
+          </div>
+        </section>
+
+        <!-- 11 (odd) image first -->
+        <section class="row reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="platforms"
+                alt="Additional platforms screenshot"
+              /><span class="glyph">🌐</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >Additional Platform Releases
+              <span class="pill p-future">Planned</span></span
+            >
+            <h2>Anywhere you want to play.</h2>
+            <p>
+              Expanding beyond the browser to more platforms, so your collection
+              and progress travel with you across every device.
+            </p>
+          </div>
+        </section>
+
+        <!-- 12 (even) description first -->
+        <section class="row reverse reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="events"
+                alt="Expanded events screenshot"
+              /><span class="glyph">🎉</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >Expanded Events <span class="pill p-future">Planned</span></span
+            >
+            <h2>Bigger moments, bigger rewards.</h2>
+            <p>
+              Limited-time events, special game modes, and community-wide
+              challenges that turn ordinary weeks into something worth showing
+              up for.
+            </p>
+          </div>
+        </section>
+
+        <!-- 13 (odd) image first -->
+        <section class="row reveal">
+          <div class="media">
+            <div class="shot">
+              <img
+                class="ss"
+                data-key="cardsets"
+                alt="New card sets screenshot"
+              /><span class="glyph">🃏</span>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag"
+              >New Card Sets <span class="pill p-future">Planned</span></span
+            >
+            <h2>Fresh heroes, new strategies.</h2>
+            <p>
+              Regular new card sets expand the roster with new heroes,
+              mechanics, and synergies — keeping deck-building fresh and the
+              meta always shifting.
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer id="play">
+      <h3>Your first pack is waiting.</h3>
+      <p>Jump in, build a deck, and start your climb.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#">Play Card Quest</a>
+      </div>
+      <div class="fine">
+        © 2026 Card Quest. Screenshots shown are from development phase. Roadmap
+        features are subject to change.
+      </div>
+    </footer>
+
+    <script>
+      /* =========================================================================
+     SCREENSHOTS — loaded by RELATIVE PATH from a ./screenshots/ folder that
+     lives next to this file. Works in a PRIVATE repo with no auth: just clone
+     the repo and open showcase.html from disk (or serve it), and the browser
+     reads the images locally — nothing is fetched from GitHub at view time.
+
+     1. Create a "screenshots" folder next to showcase.html (repo root).
+     2. Name each file after its data-key. ANY of these formats works, and you
+        can MIX them across rows — animated GIFs autoplay and loop on their own:
+          collection, progression, deck, gameplay,
+          trading, marketplace, raids, leaderboards, seasonal,
+          telegram, platforms, events, cardsets
+        e.g. collection.gif, progression.webp, deck.png ...
+
+     For each row the loader tries the extensions in IMG_EXTS in order and uses
+     the first one that exists. Any row with no matching file simply keeps its
+     emoji placeholder — the page never breaks.
+     ========================================================================= */
+      const REPO_BASE = "screenshots"; // relative folder next to this HTML file
+      const IMG_EXTS = ["gif", "webp", "png", "jpg"]; // tried in order per row
+
+      document.querySelectorAll("img.ss").forEach((img) => {
+        let i = 0;
+        const tryNext = () => {
+          if (i >= IMG_EXTS.length) return; // out of options -> keep placeholder
+          img.src = `${REPO_BASE}/${img.dataset.key}.${IMG_EXTS[i++]}`;
+        };
+        img.addEventListener("load", () => {
+          const shot = img.closest(".shot");
+          shot.classList.add("has-img");
+          img.classList.add("loaded");
+          // resize the frame to the image's real aspect ratio (no crop, no bars)
+          if (img.naturalWidth && img.naturalHeight) {
+            shot.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+          }
+        });
+        img.addEventListener("error", tryNext); // this extension missing -> try the next
+        tryNext();
+      });
+
+      // Apple-style scroll reveal
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("in");
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>
