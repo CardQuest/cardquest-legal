@@ -25,6 +25,11 @@
 
       html {
         scroll-behavior: smooth;
+        overflow-x: hidden; /* guard against any stray horizontal overflow */
+      }
+      html,
+      body {
+        max-width: 100%;
       }
 
       body {
@@ -195,10 +200,11 @@
         margin-bottom: 10px;
       }
       header.hero h1 {
-        font-size: clamp(40px, 8vw, 80px);
+        font-size: clamp(34px, 8vw, 80px);
         font-weight: 700;
         letter-spacing: -0.03em;
         line-height: 1.05;
+        overflow-wrap: break-word;
         background: linear-gradient(
           120deg,
           #1d1d1f 30%,
@@ -543,7 +549,7 @@
 
     <header class="hero">
       <div class="eyebrow">Card Quest</div>
-      <h1>Collect.&nbsp;Battle.&nbsp;Ascend.</h1>
+      <h1>Collect. Battle. Ascend.</h1>
       <p class="sub">
         A living trading-card universe of strategic duels, glittering packs, and
         a player-run economy — all in your browser.
