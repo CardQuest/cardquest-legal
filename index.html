@@ -99,19 +99,81 @@
       nav .links {
         display: flex;
         gap: 26px;
+        align-items: center;
       }
       nav .links a {
         color: var(--ink-soft);
         text-decoration: none;
         font-size: 13px;
+        white-space: nowrap;
         transition: color 0.2s ease;
       }
       nav .links a:hover {
         color: var(--ink);
       }
+      /* hamburger button — hidden on desktop, shown on mobile */
+      .nav-toggle {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        width: 40px;
+        height: 40px;
+        padding: 9px;
+        margin: -9px -9px -9px 0; /* keep the 48px bar height, extend tap area */
+        background: transparent;
+        border: none;
+        cursor: pointer;
+      }
+      .nav-toggle span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--ink);
+        transition:
+          transform 0.3s ease,
+          opacity 0.2s ease;
+      }
+
       @media (max-width: 720px) {
+        .nav-toggle {
+          display: flex;
+        }
+        /* links collapse into a dropdown panel under the bar */
         nav .links {
-          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+          background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: saturate(180%) blur(20px);
+          -webkit-backdrop-filter: saturate(180%) blur(20px);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.32s cubic-bezier(0.2, 0.7, 0.2, 1);
+        }
+        nav.open .links {
+          max-height: 70vh;
+        }
+        nav .links a {
+          font-size: 16px;
+          padding: 15px 22px;
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        /* morph the hamburger into an X when open */
+        nav.open .nav-toggle span:nth-child(1) {
+          transform: translateY(7px) rotate(45deg);
+        }
+        nav.open .nav-toggle span:nth-child(2) {
+          opacity: 0;
+        }
+        nav.open .nav-toggle span:nth-child(3) {
+          transform: translateY(-7px) rotate(-45deg);
         }
       }
 
@@ -404,6 +466,28 @@
         }
       }
 
+      @media (max-width: 640px) {
+        header.hero {
+          padding: 88px 20px 64px;
+        }
+        header.hero .cta {
+          margin-top: 30px;
+        }
+        .features {
+          padding: 16px 18px;
+        }
+        .section-head {
+          padding: 52px 0 6px;
+        }
+        /* let the larger gameplay shot use the full column on phones */
+        .media .shot {
+          --shot-scale: 1 !important;
+        }
+        footer {
+          padding: 56px 20px 44px;
+        }
+      }
+
       /* ---------- Footer ---------- */
       footer {
         background: var(--bg-alt);
@@ -436,7 +520,16 @@
     <nav>
       <div class="nav-inner">
         <div class="brand"><span class="dot"></span> Card Quest</div>
-        <div class="links">
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+          aria-controls="nav-links"
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <div class="links" id="nav-links">
           <a href="#available">Available</a>
           <a href="#development">In Development</a>
           <a href="#roadmap">Roadmap</a>
@@ -956,6 +1049,27 @@
         { threshold: 0.15 },
       );
       document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+      // Mobile nav: hamburger toggles the dropdown; any link closes it.
+      const navEl = document.querySelector("nav");
+      const navToggle = document.querySelector(".nav-toggle");
+      const closeNav = () => {
+        navEl.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      };
+      navToggle.addEventListener("click", () => {
+        const open = navEl.classList.toggle("open");
+        navToggle.setAttribute("aria-expanded", String(open));
+      });
+      navEl
+        .querySelectorAll(".links a")
+        .forEach((a) => a.addEventListener("click", closeNav));
+      // tapping outside the menu closes it too
+      document.addEventListener("click", (e) => {
+        if (navEl.classList.contains("open") && !navEl.contains(e.target)) {
+          closeNav();
+        }
+      });
     </script>
   </body>
 </html>
